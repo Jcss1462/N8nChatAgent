@@ -1,5 +1,4 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
-import LoadingOverlay from "./components/LoadingOverlay"
 import MainComponentLayout from "./layouts/MainComponentLayout"
 import ChatPage from "./pages/ChatPage"
 
@@ -14,7 +13,7 @@ function App() {
           <Route path="/" element={<ChatPage />} />
         </Route>
       </Routes>
-      <LoadingOverlay />
+      {/* <LoadingOverlay />*/}
     </BrowserRouter>
   )
 }

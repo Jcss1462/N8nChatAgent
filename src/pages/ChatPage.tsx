@@ -4,14 +4,14 @@ import { askChat } from "../services/chatService";
 import type { AskChatModel } from "../models/AskChatModel";
 import { toast } from "sonner";
 import type { ChatHistoryModel } from "../models/ChatHistoryModel";
-import { SendIcon } from "lucide-react";
+import { MoreHorizontal, SendIcon } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 
 export default function ChatPage() {
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<ChatHistoryModel[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const { setLoading } = useUIStore();
+  const { loading, setLoading } = useUIStore();
 
   const handleSendMessage = async () => {
     if (message.trim() === "") return;
@@ -92,6 +92,22 @@ export default function ChatPage() {
               </div>
             </div>
           ))}
+          {/* Loader*/}
+          {loading && (
+            <div
+              className={"flex items-end gap-2 justify-start"}
+            >
+              <div className="w-8 h-8 rounded-full bg-slate-300 flex-shrink-0"></div>
+              <div
+                className="px-4 py-3 rounded-2xl max-w-md bg-brand-white text-brand-dark rounded-bl-none"
+              >
+                <p className="text-lg">
+                  <MoreHorizontal className="h-10 w-10 text-brand-light animate-pulse" />
+                </p>
+              </div>
+            </div>
+          )}
+
           <div ref={bottomRef} />
         </div>
 
