@@ -1,15 +1,52 @@
 import { useState, useRef, useEffect } from "react";
+import { useUIStore } from "../store/useUIStore";
+import { askChat } from "../services/chatService";
+import type { AskChatModel } from "../models/AskChatModel";
+import { toast } from "sonner";
+import type { ChatHistoryModel } from "../models/ChatHistoryModel";
 
 export default function ChatPage() {
   const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<string[]>([]);
+  const [chatHistory, setChatHistory] = useState<ChatHistoryModel[]>([]);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const { setLoading } = useUIStore();
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() === "") return;
-    setChatHistory((prev) => [...prev, message]);
+
+    let historial: ChatHistoryModel = {
+      message: message,
+      isUsser: true
+    }
+
+
+    setChatHistory((prev) => [...prev, historial]);
+    await sendAskToChat(message);
     setMessage("");
   };
+
+  const sendAskToChat = async (message: string) => {
+
+    let question: AskChatModel = {
+      message: message
+    }
+
+    setLoading(true);
+    await askChat(question).then((response) => {
+      let historial: ChatHistoryModel = {
+        message: response.data,
+        isUsser: false
+      }
+      setChatHistory((prev) => [...prev, historial]);
+
+    }).catch((err) => {
+      toast.error("Error al consultar info" + err);
+    }).finally(() => {
+      setLoading(false);
+    });
+
+  };
+
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") handleSendMessage();
@@ -31,11 +68,19 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0">
         {chatHistory.length > 0 ? (
           chatHistory.map((msg, index) => (
+            // 1. Añadimos un div contenedor para cada mensaje
             <div
               key={index}
-              className="bg-brand-light text-white px-4 py-2 rounded-md max-w-xs self-end"
+              className={`flex ${msg.isUsser ? 'justify-start' : 'justify-end'
+                }`}
             >
-              {msg}
+              {/* 2. El div del mensaje ahora solo tiene estilos de apariencia */}
+              <div
+                className={`text-white px-4 py-2 rounded-md max-w-xs ${msg.isUsser ? 'bg-brand-light' : 'bg-brand-dark'
+                  }`}
+              >
+                {msg.message}
+              </div>
             </div>
           ))
         ) : (
