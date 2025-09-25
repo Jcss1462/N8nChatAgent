@@ -4,6 +4,8 @@ import { askChat } from "../services/chatService";
 import type { AskChatModel } from "../models/AskChatModel";
 import { toast } from "sonner";
 import type { ChatHistoryModel } from "../models/ChatHistoryModel";
+import { SendIcon } from "lucide-react";
+import ReactMarkdown from 'react-markdown';
 
 export default function ChatPage() {
   const [message, setMessage] = useState("");
@@ -58,56 +60,60 @@ export default function ChatPage() {
   }, [chatHistory]);
 
   return (
-    <div className="flex flex-col h-[84vh] bg-brand-white">
-      {/* Header */}
-      <header className="px-6 py-4 bg-brand-dark text-white text-xl font-bold shadow">
+    // Mantenemos un fondo neutro para que tus colores de marca resalten
+    <div className="flex flex-col h-[84vh] bg-slate">
+
+      {/* Header usando tu blanco y azul oscuro para el texto */}
+      <header className="px-6 py-4 bg-brand-white text-brand-dark text-xl font-semibold shadow-sm w-full z-10">
         Chat
       </header>
 
-      {/* Área de mensajes (scrollable y flexible) */}
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 min-h-0">
-        {chatHistory.length > 0 ? (
-          chatHistory.map((msg, index) => (
-            // 1. Añadimos un div contenedor para cada mensaje
+      <main className="flex flex-col w-full max-w-4xl mx-auto flex-1">
+
+        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4 scroll-smooth">
+          {chatHistory.map((msg, index) => (
             <div
               key={index}
-              className={`flex ${msg.isUsser ? 'justify-start' : 'justify-end'
-                }`}
+              className={`flex items-end gap-2 ${msg.isUsser ? 'justify-end' : 'justify-start'}`}
             >
-              {/* 2. El div del mensaje ahora solo tiene estilos de apariencia */}
+              {!msg.isUsser && (
+                <div className="w-8 h-8 rounded-full bg-slate-300 flex-shrink-0"></div>
+              )}
+
               <div
-                className={`text-white px-4 py-2 rounded-md max-w-xs ${msg.isUsser ? 'bg-brand-light' : 'bg-brand-dark'
+                className={`px-4 py-3 rounded-2xl max-w-md ${msg.isUsser
+                  ? 'bg-brand-light text-brand-white rounded-br-none' // Burbuja del usuario con tu azul claro
+                  : 'bg-brand-white text-brand-dark rounded-bl-none'   // Burbuja del otro con tu blanco y texto oscuro
                   }`}
               >
-                {msg.message}
+                <p className="text-lg">
+                  <ReactMarkdown>{msg.message}</ReactMarkdown>
+                </p>
               </div>
             </div>
-          ))
-        ) : (
-          <p className="text-gray-500 text-center mt-10">
-            No hay mensajes aún. Escribe algo abajo.
-          </p>
-        )}
-        <div ref={bottomRef} />
-      </div>
+          ))}
+          <div ref={bottomRef} />
+        </div>
 
-      {/* Barra de entrada (pegada abajo siempre) */}
-      <div className="px-4 py-3 border-t border-gray-300 bg-white flex items-center gap-2">
-        <input
-          type="text"
-          placeholder="Escribe un mensaje..."
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyPress}
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-light"
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-brand-accent text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition"
-        >
-          Enviar
-        </button>
-      </div>
+        {/* Barra de entrada con tu color de acento naranja en el botón */}
+        <div className="px-6 py-4 bg-brand-white/80 backdrop-blur-sm border-t border-slate-200 flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Escribe un mensaje..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            className="flex-1 px-4 py-2 bg-slate-100 border border-transparent rounded-full focus:outline-none focus:ring-2 focus:ring-brand-light transition"
+          />
+          <button
+            onClick={handleSendMessage}
+            className="bg-brand-accent hover:bg-brand-accent-hover text-white w-10 h-10 rounded-full flex items-center justify-center transition flex-shrink-0"
+            aria-label="Enviar mensaje"
+          >
+            <SendIcon className="w-5 h-5" />
+          </button>
+        </div>
+      </main>
     </div>
   );
 }
